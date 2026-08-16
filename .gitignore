@@ -1,0 +1,33 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.env
+
+# Model weights and large files
+model/saved/*.h5
+model/saved/*.keras
+data/raw/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# VS Code
+.vscode/
+
+# JetBrains / PyCharm
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
