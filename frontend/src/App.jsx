@@ -1,122 +1,124 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState, useEffect, useRef } from 'react';
 
-function App() {
-  const [count, setCount] = useState(0)
+const GESTURES = [
+  { id: 'thumbs_up', label: 'thumbs up', emoji: '👍' },
+  { id: 'peace', label: 'peace', emoji: '✌️' },
+  { id: 'heart', label: 'heart', emoji: '🫶' },
+  { id: 'wave', label: 'wave', emoji: '👋' },
+  { id: 'fist', label: 'fist', emoji: '✊' },
+];
+
+const IOSEmoji = ({ emoji, size = 'sm' }) => (
+  <img
+    src={`https://emojicdn.elk.sh/${encodeURIComponent(emoji)}?style=apple`}
+    alt={emoji}
+    className={size === 'lg' ? 'ios-emoji-lg' : 'ios-emoji-sm'}
+    loading="lazy"
+  />
+);
+
+export default function App() {
+  const [activeGesture, setActiveGesture] = useState('peace');
+  const [confidence, setConfidence] = useState(94);
+  const [detectedObjects, setDetectedObjects] = useState([
+    { name: 'cell phone', confidence: 92, emoji: '📱' },
+    { name: 'cup', confidence: 88, emoji: '☕' },
+  ]);
+
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    // start local webcam for feed demo
+    async function setupCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (err) {
+        console.warn('Webcam permission pending or not available:', err);
+      }
+    }
+    setupCamera();
+  }, []);
+
+  const currentGestureObj = GESTURES.find(g => g.id === activeGesture) || GESTURES[1];
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div className="app-wrapper">
+      {/* top header — centered chips */}
+      <header className="top-header">
+        <div className="gesture-chips">
+          {GESTURES.map((g) => (
+            <button
+              key={g.id}
+              className={`chip ${activeGesture === g.id ? 'active' : ''}`}
+              onClick={() => setActiveGesture(g.id)}
+            >
+              <IOSEmoji emoji={g.emoji} size="sm" />
+              <span>{g.label}</span>
+            </button>
+          ))}
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+      </header>
+
+      {/* main content grid */}
+      <main className="main-grid">
+        {/* left: camera viewfinder card */}
+        <div className="camera-card">
+          <div className="video-container">
+            {/* top progress line */}
+            <div className="progress-bar-container">
+              <div className="progress-fill" style={{ width: `${confidence}%` }}></div>
+            </div>
+
+            {/* mirrored webcam video */}
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted
+              className="webcam-video"
+            />
+
+            {/* bottom floating detection badge */}
+            <div className="detection-pill">
+              <span className="dot-indicator"></span>
+              <span>detected: <IOSEmoji emoji={currentGestureObj.emoji} size="sm" /> {currentGestureObj.label} ({confidence}%)</span>
+            </div>
+          </div>
+
+          <p className="camera-caption">
+            show a hand to the camera &middot; hold the gesture for ~0.7s
           </p>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+        {/* right: ai output display & objects card */}
+        <div className="result-card">
+          <div className="result-image-wrapper">
+            <IOSEmoji emoji={currentGestureObj.emoji} size="lg" />
+          </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          {/* handwriting sticker */}
+          <div className="sticker-badge">
+            <span>{currentGestureObj.label}</span>
+            <IOSEmoji emoji={currentGestureObj.emoji} size="sm" />
+          </div>
+
+          {/* detected objects section */}
+          <div className="objects-section">
+            <span className="objects-title">Detected Objects</span>
+            <div className="objects-list">
+              {detectedObjects.map((obj, idx) => (
+                <div key={idx} className="object-chip">
+                  <IOSEmoji emoji={obj.emoji} size="sm" />
+                  <span>{obj.name} ({obj.confidence}%)</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      </main>
+    </div>
+  );
 }
-
-export default App
