@@ -11,7 +11,7 @@ class ObjectDetector:
     def detect(self, frame, conf_threshold=0.3):
         h, w = frame.shape[:2]
 
-        # CRITICAL FIX: convert OpenCV BGR frame to RGB for neural network color accuracy
+        # convert OpenCV BGR frame to RGB for neural network color accuracy
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
         results = self.model(rgb_frame, conf=conf_threshold, verbose=False)[0]
@@ -38,6 +38,6 @@ if __name__ == '__main__':
     import numpy as np
     detector = ObjectDetector()
     dummy_frame = np.zeros((480, 640, 3), dtype=np.uint8)
-    results = detector.detect(dummy_frame, conf_threshold=0.50)
+    results = detector.detect(dummy_frame, conf_threshold=0.3)
 
     print("object detector initialized successfully! detected objects in test frame:", results)
