@@ -1,0 +1,41 @@
+import cv2
+from ultralytics import YOLO
+
+
+class ObjectDetector:
+    # ultra-lightweight nn pretrained on 80 objs (daily objects)
+    def __init__(self, model_name="yolo11n.pt"):
+        self.model = YOLO(model_name)
+
+    # method takes in a frame & confidence level to filter out uncertain detections
+    def detect(self, frame, conf_threshold=0.5):
+        # list of detections per frame
+        results = self.model(frame, conf=conf_threshold, verbose=False)[0]
+        
+        detections = []
+        
+        # loop through detected objects & extract info
+        for box in results.boxes:
+            x1, y1, x2, y2 = box.xyxy[0].tolist() # bounding box coords
+            confidence = float(box.conf[0])
+            class_id = int(box.cls[0])
+            label = self.model.names[class_id]
+
+            # store detection + its accuracy + box coords
+            detections.append({
+                'name': label,
+                'confidence': round(confidence, 2),
+                'box': [int(x1), int(y1), int(x2), int(y2)]
+            })
+        return detections
+
+if __name__ == '__main__':
+    
+    # test object detector 
+    import numpy as np
+    detector = ObjectDetector()
+    dummy_frame = np.zeros((480, 640, 3), dtype=np.uint8)
+    results = detector.detect(dummy_frame, conf_threshold=0.5)
+
+    print("object detector initialized successfully! detected objects in test frame:", results)
+        
