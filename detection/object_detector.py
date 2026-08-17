@@ -3,14 +3,18 @@ from ultralytics import YOLO
 
 
 class ObjectDetector:
-    # ultra-lightweight nn pretrained on 80 objs (daily objects)
-    def __init__(self, model_name="yolo11n.pt"):
+    # yolo11m.pt (medium model, 20M params) provides state-of-the-art accuracy for everyday objects
+    def __init__(self, model_name="yolo11m.pt"):
         self.model = YOLO(model_name)
 
     # method takes in a frame & confidence level to filter out uncertain detections
-    def detect(self, frame, conf_threshold=0.5):
+    def detect(self, frame, conf_threshold=0.3):
         h, w = frame.shape[:2]
-        results = self.model(frame, conf=conf_threshold, verbose=False)[0]
+
+        # CRITICAL FIX: convert OpenCV BGR frame to RGB for neural network color accuracy
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        
+        results = self.model(rgb_frame, conf=conf_threshold, verbose=False)[0]
         
         detections = []
         
@@ -34,6 +38,6 @@ if __name__ == '__main__':
     import numpy as np
     detector = ObjectDetector()
     dummy_frame = np.zeros((480, 640, 3), dtype=np.uint8)
-    results = detector.detect(dummy_frame, conf_threshold=0.5)
+    results = detector.detect(dummy_frame, conf_threshold=0.50)
 
     print("object detector initialized successfully! detected objects in test frame:", results)
