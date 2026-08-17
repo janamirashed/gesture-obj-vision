@@ -81,7 +81,7 @@ export default function App() {
         noHandCounterRef.current = 0;
         const history = gestureHistoryRef.current;
         history.push(topGesture);
-        if (history.length > 6) history.shift();
+        if (history.length > 3) history.shift();
 
         // count occurrences of each gesture in recent frame history
         const counts = {};
@@ -99,8 +99,8 @@ export default function App() {
           }
         });
 
-        // update active gesture if held consistently for 4+ consecutive frames
-        if (maxGesture && maxCount >= 4) {
+        // update active gesture quickly if held for 2+ frames (~0.1s)
+        if (maxGesture && maxCount >= 2) {
           setActiveGesture(maxGesture);
           setConfidence(Math.round(topGesture.confidence * 100));
         }
@@ -113,8 +113,8 @@ export default function App() {
 
     function handleNoHandDetected() {
       noHandCounterRef.current += 1;
-      // if no valid hand detected for 8 consecutive frames (~0.3s), reset to placeholder
-      if (noHandCounterRef.current >= 8) {
+      // if no valid hand detected for 4 consecutive frames (~0.15s), reset to placeholder
+      if (noHandCounterRef.current >= 4) {
         gestureHistoryRef.current = [];
         setActiveGesture('none');
         setConfidence(0);
