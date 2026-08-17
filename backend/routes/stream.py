@@ -21,6 +21,9 @@ async def websocket_stream(websocket: WebSocket):
     await websocket.accept()
     print("websocket client connected")
 
+    frame_count = 0
+    cached_objects = []
+
     try:
         while True:
             # receive base64 encoded frame string from react
@@ -30,15 +33,23 @@ async def websocket_stream(websocket: WebSocket):
             if frame is None:
                 continue
 
-            # run gesture detection and object detection on current frame
+            frame_count += 1
+
+            # run gesture detection on 100% of frames for instant zero-lag tracking
             gestures = gesture_detector.predict(frame)
-            objects = object_detector.detect(frame, conf_threshold=0.5)
+
+            # run yolo object detection every 3 frames to optimize cpu performance
+            if frame_count % 3 == 0 or not cached_objects:
+                cached_objects = object_detector.detect(frame, conf_threshold=0.5)
 
             # send combined json response back to react
-            await websocket.send_json({
-                "gestures": gestures,
-                "objects": objects
-            })
+            try:
+                await websocket.send_json({
+                    "gestures": gestures,
+                    "objects": cached_objects
+                })
+            except Exception:
+                break
 
     except WebSocketDisconnect:
         print("websocket client disconnected")

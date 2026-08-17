@@ -11,8 +11,7 @@ build/
 .env
 
 # Model weights and large files
-model/saved/*.h5
-model/saved/*.keras
+*.pt
 data/raw/
 
 # Jupyter

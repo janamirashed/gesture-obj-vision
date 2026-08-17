@@ -9,7 +9,7 @@ class ObjectDetector:
 
     # method takes in a frame & confidence level to filter out uncertain detections
     def detect(self, frame, conf_threshold=0.5):
-        # list of detections per frame
+        h, w = frame.shape[:2]
         results = self.model(frame, conf=conf_threshold, verbose=False)[0]
         
         detections = []
@@ -21,16 +21,15 @@ class ObjectDetector:
             class_id = int(box.cls[0])
             label = self.model.names[class_id]
 
-            # store detection + its accuracy + box coords
+            # store detection + accuracy + normalized [0..1] box coords
             detections.append({
                 'name': label,
                 'confidence': round(confidence, 2),
-                'box': [int(x1), int(y1), int(x2), int(y2)]
+                'box': [round(x1 / w, 4), round(y1 / h, 4), round(x2 / w, 4), round(y2 / h, 4)]
             })
         return detections
 
 if __name__ == '__main__':
-    
     # test object detector 
     import numpy as np
     detector = ObjectDetector()
@@ -38,4 +37,3 @@ if __name__ == '__main__':
     results = detector.detect(dummy_frame, conf_threshold=0.5)
 
     print("object detector initialized successfully! detected objects in test frame:", results)
-        
