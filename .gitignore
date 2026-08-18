@@ -12,6 +12,7 @@ build/
 
 # Model weights and large files
 *.pt
+.*.pt*
 data/raw/
 
 # Jupyter

@@ -22,8 +22,16 @@
 
 ## Screenshots
 
+### Web App Interface
+
 <p align="center">
   <img src="frontend/public/interface.png" alt="Gesture Object Vision Interface" width="100%" />
+</p>
+
+### Model Training & Validation Performance
+
+<p align="center">
+  <img src="model/plots/training_history.png" alt="Model Training Loss and Accuracy History" width="100%" />
 </p>
 
 ---
@@ -89,4 +97,4 @@ App available at `http://localhost:5173`
 
 ## Author
 
-**Jana Rashed** — [GitHub](https://github.com/janamirashed) · [LinkedIn](https://www.linkedin.com/in/jana-rashed/) · [Portfolio](https://janamirashed.github.io/my-portfolio/)
+**Jana Rashed** — [GitHub](https://github.com/janamirashed) · [LinkedIn](https://linkedin.com) · [Portfolio](https://janamirashed.github.io)
