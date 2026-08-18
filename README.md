@@ -43,7 +43,6 @@
 - **Custom Keras Neural Network:** Classifies 5 distinct hand gesture poses (`thumbs_up`, `peace`, `heart`, `wave`, `fist`) with confidence scoring.
 - **Concurrent YOLO11 Object Detection:** Detects surrounding desk and room objects (`cell phone`, `cup`, `bottle`, `laptop`, `mouse`, `keyboard`) with normalized bounding boxes.
 - **Gesture Hold Stabilization (Debouncing):** Uses a rolling 6-frame history queue requiring a pose to be held for ~0.3s to prevent flickering while moving hands.
-- **Interactive Glassmorphic HUD:** Includes card stack hover transitions, Apple iOS emojis, dynamic status badges, and an automatic `show hand` placeholder state.
 
 ---
 
